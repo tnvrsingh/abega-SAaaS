@@ -1,14 +1,11 @@
 needs(twitteR)
 needs(syuzhet)
 needs(lubridate)
-#needs(ggplot2)
 needs(scales)
 needs(reshape2)
 needs(dplyr)
 needs(stringr)
-needs(wordcloud)
-needs(tm)
-
+needs(jsonlite)
 # Declare Twitter API Credentials
 api_key <- "8lnpCFsYYf5tg5yjm2ozql0WL" 
 api_secret <- "bER9uVmtsBSR7x9DQ1c06DF4riIfiOCgrnomjViTQmWRi5sBzB" 
@@ -17,12 +14,16 @@ token_secret <- "2hGZHORNcDA0aWP0fAxMFM1jQN3QzOjpQkVdSfkG23zMs"
 
 setup_twitter_oauth(api_key, api_secret, token, token_secret)
 
-tweets <- searchTwitter(input, n=200)
+tweets <- searchTwitter(input, n=100)
 
 #print (tweets)
 
-tweets.df <- twListToDF(tweets)
+tweetsdf <- twListToDF(tweets)
+#write.csv(tweetsdf, file = "MyData.csv")
+
 tweets = sapply(tweets,function(x) x$getText())
+
+Created  <- tweetsdf$created
 
 # CLEANING BEGINS
 
@@ -38,41 +39,59 @@ tweets_cl <- gsub('\\d+', '', tweets_cl)
 
 tweets = tolower(tweets_cl)
 print("LOWER DONE")
-
-tweetsb = tweets
-
 mySentiment <- get_nrc_sentiment(tweets)
-print ("sentiment analysis done!")
-
-write.csv(tweets, file = "trumpet3.csv")
-print("written to file")
-
-print("***** PRINTING SENTIMENT *****")
-#print(mySentiment)
-
+#write.csv(tweets, file = "trumpet3.csv")
 tweets <- cbind(tweets, mySentiment)
-print ("Sentiment binding done")
-
-#tweets
 
 print("******** PRINTINT t ******")
 t<-tweets[c(2:11)]
-#print(t)
 
-print("**** SENTIMENT TOTALS")
 
 sentimentTotals <- data.frame(colSums(tweets[c(2:11)]))
 print(sentimentTotals)
-# names(sentimentTotals) <- "count"
-# sentimentTotals <- cbind("sentiment" = rownames(sentimentTotals), sentimentTotals)
-# rownames(sentimentTotals) <- NULL
-# ggplot(data = sentimentTotals, aes(x = sentiment, y = count)) +
-#         geom_bar(aes(fill = sentiment), stat = "identity") +
-#         theme(legend.position = "none") +
-#         xlab("Sentiment") + ylab("Total Count") + ggtitle("Total Sentiment Score for All Tweets")
 
-# wordCorpus <- Corpus(VectorSource(tweetsb))
-# wordCorpus <- tm_map(wordCorpus, stemDocument)
-# wordcloud(words = wordCorpus , scale=c(5,0.1), max.words=100, random.order=FALSE, 
-#           rot.per=0.35, use.r.layout=FALSE)
+Created <- with_tz(ymd_hms(Created))
+
+posnegtime <- tweets %>% 
+        group_by(timestamp = cut(Created, breaks="2 months")) %>%
+        summarise(negative = mean(negative),
+                  positive = mean(positive)) %>% melt(id.vars="timestamp")
+
+names(posnegtime) <- c("timestamp", "sentiment", "meanvalue")
+
+posnegtime$sentiment = factor(posnegtime$sentiment,levels(posnegtime$sentiment)[c(1,2)])
+
+
+posnegtime$sentiment = factor(posnegtime$sentiment,levels(posnegtime$sentiment)[c(2,1)])
+
+
+tweets$weekday <- wday(Created, label = TRUE)
+weeklysentiment <- tweets %>% group_by(weekday) %>% 
+        summarise(anger = mean(anger), 
+                  anticipation = mean(anticipation), 
+                  disgust = mean(disgust), 
+                  fear = mean(fear), 
+                  joy = mean(joy), 
+                  sadness = mean(sadness), 
+                  surprise = mean(surprise), 
+                  trust = mean(trust)) %>% melt(id.vars="weekday")
+names(weeklysentiment) <- c("weekday", "sentiment", "meanvalue")
+
+
+tweets$month <- month(Created, label = TRUE)
+monthlysentiment <- tweets %>% group_by(month) %>% 
+        summarise(anger = mean(anger), 
+                  anticipation = mean(anticipation), 
+                  disgust = mean(disgust), 
+                  fear = mean(fear), 
+                  joy = mean(joy), 
+                  sadness = mean(sadness), 
+                  surprise = mean(surprise), 
+                  trust = mean(trust)) %>% melt(id.vars="month")
+names(monthlysentiment) <- c("month", "sentiment", "meanvalue")
+
+combinedData <-  c(sentimentTotals, posnegtime, weeklysentiment, monthlysentiment)
+
+x <- toJSON(combinedData, pretty=TRUE)
+x
 

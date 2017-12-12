@@ -3,7 +3,7 @@ exports.getSampleResponse = function(req, res) {
 	var R = require("r-script");
 
 	var out = R("./sentiment.R")
-	  .data("Bengaluru")
+	  .data("#virushkaKiShadi")
 	  .callSync();
 
 	console.log(out)
