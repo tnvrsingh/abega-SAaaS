@@ -10,10 +10,10 @@ needs(wordcloud)
 needs(tm)
 
 # Declare Twitter API Credentials
-api_key <- "nOMPqC5PNtElymf02yilCTbLH" # From dev.twitter.com
-api_secret <- "QlVUeKwt4vB1Qkw0LS4OaXrMAU000nPUFO7EXbu1wWADv8yNHX" # From dev.twitter.com
-token <- "1977401202-j67KajnfdJjVnvewXvakyWDJVD6GulJm1u81Reh" # From dev.twitter.com
-token_secret <- "vOARZdGRQFVw0pwDakwnzaQup9ysSkd1PqzAVLR82VOL5" # From dev.twitter.com
+api_key <- "8lnpCFsYYf5tg5yjm2ozql0WL" 
+api_secret <- "bER9uVmtsBSR7x9DQ1c06DF4riIfiOCgrnomjViTQmWRi5sBzB" 
+token <- "1977401202-bwaS9YLmW3guWnfT2lcg4XPKUxciPTrUh3oq4i3"
+token_secret <- "2hGZHORNcDA0aWP0fAxMFM1jQN3QzOjpQkVdSfkG23zMs"
 
 setup_twitter_oauth(api_key, api_secret, token, token_secret)
 
