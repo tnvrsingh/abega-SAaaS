@@ -1,0 +1,30 @@
+{
+  "name": "abega",
+  "version": "1.0.0",
+  "description": "Sentiment Analysis As a Service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tnvrsingh/abega.git"
+  },
+  "author": "Tanvir Singh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tnvrsingh/abega/issues"
+  },
+  "homepage": "https://github.com/tnvrsingh/abega#readme",
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "handlebars": "^4.0.10",
+    "mongoose": "^4.11.7",
+    "r-script": "0.0.3"
+  }
+}
