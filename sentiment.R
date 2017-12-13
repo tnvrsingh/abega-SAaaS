@@ -14,7 +14,7 @@ token_secret <- "2hGZHORNcDA0aWP0fAxMFM1jQN3QzOjpQkVdSfkG23zMs"
 
 setup_twitter_oauth(api_key, api_secret, token, token_secret)
 
-tweets <- searchTwitter(input, n=100)
+tweets <- searchTwitter(input, n=1000, resultType="recent")
 
 #print (tweets)
 
@@ -43,13 +43,11 @@ mySentiment <- get_nrc_sentiment(tweets)
 #write.csv(tweets, file = "trumpet3.csv")
 tweets <- cbind(tweets, mySentiment)
 
-print("******** PRINTINT t ******")
 t<-tweets[c(2:11)]
 
 
 sentimentTotals <- data.frame(colSums(tweets[c(2:11)]))
-print(sentimentTotals)
-
+colnames(sentimentTotals) <- ("sentimentTotals")
 Created <- with_tz(ymd_hms(Created))
 
 posnegtime <- tweets %>% 
@@ -57,7 +55,7 @@ posnegtime <- tweets %>%
         summarise(negative = mean(negative),
                   positive = mean(positive)) %>% melt(id.vars="timestamp")
 
-names(posnegtime) <- c("timestamp", "sentiment", "meanvalue")
+names(posnegtime) <- c("timestamp", "sentiment", "meanvalueposneg")
 
 posnegtime$sentiment = factor(posnegtime$sentiment,levels(posnegtime$sentiment)[c(1,2)])
 
@@ -75,7 +73,7 @@ weeklysentiment <- tweets %>% group_by(weekday) %>%
                   sadness = mean(sadness), 
                   surprise = mean(surprise), 
                   trust = mean(trust)) %>% melt(id.vars="weekday")
-names(weeklysentiment) <- c("weekday", "sentiment", "meanvalue")
+names(weeklysentiment) <- c("weekday", "sentiment", "meanvalueweek")
 
 
 tweets$month <- month(Created, label = TRUE)
@@ -88,7 +86,7 @@ monthlysentiment <- tweets %>% group_by(month) %>%
                   sadness = mean(sadness), 
                   surprise = mean(surprise), 
                   trust = mean(trust)) %>% melt(id.vars="month")
-names(monthlysentiment) <- c("month", "sentiment", "meanvalue")
+names(monthlysentiment) <- c("month", "sentiment", "meanvaluemonth")
 
 combinedData <-  c(sentimentTotals, posnegtime, weeklysentiment, monthlysentiment)
 
